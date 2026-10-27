@@ -44,7 +44,10 @@ export default function ComplaintMap({ complaints }: { complaints: Complaint[] }
     <div className="filter-bar card-surface map-filters"><div className="filter-control"><select aria-label="Filter map by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>{statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}</select></div><div className="filter-control"><select aria-label="Filter map by category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option value="ALL">All categories</option>{categories.map((category) => <option key={category}>{category}</option>)}</select></div></div>
     <div className="card-surface map-wrapper">
       <MapContainer center={initialCenter} zoom={point ? 14 : 11} scrollWheelZoom style={{ height: 430, width: '100%' }}>
-        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer
+  url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+/>
         <RecenterMap point={point}/>
         {pinned.map(({ complaint, point: markerPoint }) => <Marker key={complaint.id} position={markerPoint} icon={issueIcon} eventHandlers={{ click: () => setSelectedId(complaint.id) }}>
           <Popup><div className="map-popup"><strong>{complaint.title}</strong><span>{complaint.ticket_id}</span><span>{complaint.category} · {complaint.urgency}</span><span>{complaint.area}{complaint.ward ? ` · ${complaint.ward}` : ''}</span><span>{complaint.status.replaceAll('_', ' ')}</span></div></Popup>
