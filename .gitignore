@@ -1,0 +1,25 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+server/dist/
+server/.env
+.env
+*.log
+.DS_Store
+.vscode/
+server/uploads/*
+!server/uploads/.gitkeep
+# Release/security: local secrets, patch backups, logs, and uploaded citizen photos
+.env
+.env.*
+!**/.env.example
+server/.env
+*.log
+*.bak
+*.bak-*
+server/uploads/*
+!server/uploads/.gitkeep
+
+# TypeScript build cache
+*.tsbuildinfo

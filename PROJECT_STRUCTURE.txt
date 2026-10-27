@@ -1,0 +1,47 @@
+civicconnect-ai/
+├── README.md
+├── docker-compose.yml
+├── .gitignore
+├── client/
+│   ├── index.html
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── src/
+│       ├── main.tsx
+│       ├── App.tsx
+│       ├── api.ts
+│       ├── types.ts
+│       ├── styles.css
+│       └── components/
+│           ├── ComplaintForm.tsx
+│           └── StatCard.tsx
+└── server/
+    ├── .env.example
+    ├── package.json
+    ├── tsconfig.json
+    ├── uploads/
+    └── src/
+        ├── app.ts
+        ├── index.ts
+        ├── config/env.ts
+        ├── db/
+        │   ├── pool.ts
+        │   ├── schema.sql
+        │   ├── migrate.ts
+        │   └── seed.ts
+        ├── middleware/
+        │   ├── auth.ts
+        │   └── errors.ts
+        ├── routes/
+        │   ├── auth.ts
+        │   ├── complaints.ts
+        │   ├── dashboard.ts
+        │   ├── notifications.ts
+        │   └── users.ts
+        ├── services/
+        │   ├── ai.ts
+        │   ├── duplicates.ts
+        │   ├── duplicates.test.ts
+        │   └── escalation.ts
+        └── types/index.ts

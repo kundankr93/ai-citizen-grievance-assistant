@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: civicconnect-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: civicconnect
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - civicconnect_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d civicconnect"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+volumes:
+  civicconnect_pgdata:

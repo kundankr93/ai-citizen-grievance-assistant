@@ -1,0 +1,22 @@
+CIVICCONNECT AI — QUICK START
+
+1. Install Node.js 20+ and Docker Desktop for Windows.
+2. Extract the ZIP to a normal writable folder.
+3. Open the extracted civicconnect-ai folder.
+4. Right-click start-windows.ps1 and select “Run with PowerShell”.
+   If Windows blocks scripts, open PowerShell in this folder and run:
+      powershell -ExecutionPolicy Bypass -File .\start-windows.ps1
+5. The script will create server/.env, start PostgreSQL via Docker, install dependencies,
+   apply the schema, create demo accounts/sample reports, and start both app servers.
+6. Open http://localhost:5173 if the browser does not open automatically.
+
+Demo password: Demo@12345
+Demo citizen: citizen@civicconnect.demo
+Demo admin: admin@civicconnect.demo
+Water officer: officer.water@civicconnect.demo
+Roads officer: officer.roads@civicconnect.demo
+
+Real AI requires a valid Google Gemini API key in server/.env (GEMINI_API_KEY=...).
+Without it, the app runs in clearly labelled DEMO MODE with rule-based classification and
+lexical duplicate suggestions. The application is not connected to an official government system.
+Read README.md for requirements, security notes, API routes, and known limitations.
