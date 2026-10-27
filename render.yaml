@@ -4,7 +4,8 @@ services:
     runtime: node
     plan: free
     buildCommand: npm ci --include=dev --prefix server && npm ci --include=dev --prefix client && npm run build --prefix server && npm run build --prefix client
-    startCommand: npm run db:migrate --prefix server && npm start --prefix server
+    # TEMPORARY: after the first successful deploy, restore the original startCommand from render.yaml.restore.
+    startCommand: npm run db:migrate --prefix server && npm run db:seed --prefix server && npm start --prefix server
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
