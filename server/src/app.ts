@@ -22,8 +22,16 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      imgSrc: ["'self'", 'data:', 'blob:', 'https://*.tile.openstreetmap.org'],
-      styleSrc: ["'self'", "'unsafe-inline'"]
+      'img-src': [
+        "'self'",
+        'data:',
+        'blob:',
+        'https://*.tile.openstreetmap.org'
+      ],
+      'style-src': [
+        "'self'",
+        "'unsafe-inline'"
+      ]
     }
   }
 }));
