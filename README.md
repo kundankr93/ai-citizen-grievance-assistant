@@ -1,70 +1,161 @@
 # CivicConnect AI — Citizen Grievance Assistant
 
-A full-stack civic-tech MVP for reporting and tracking local service issues. It includes an AI-assisted triage path, a clearly labelled rule-based fallback, a possible-duplicate suggestion, role-based views, an administrator assignment workflow, officer status updates, an activity timeline, notifications, SLA escalation, and category analytics.
+**A full-stack civic-tech application that helps citizens report local issues and helps administrators route, prioritize, and track their resolution.**
 
-> **Prototype disclaimer:** This is an independent demonstration app. It is not connected to any municipal corporation or government grievance platform. Demo users and seeded complaints are fictional sample data. AI urgency/category outputs are suggestions and must be reviewed by a person. Do not use this prototype to submit emergencies or sensitive personal information.
+- **Live demo:** https://ai-citizen-grievance-assistant.onrender.com/
+- **API health:** https://ai-citizen-grievance-assistant.onrender.com/api/health
+- **Source code:** https://github.com/kundankr93/ai-citizen-grievance-assistant
 
-## Stack
+> **Project status:** Portfolio/demo prototype. This project is not affiliated with or connected to any municipal corporation or official government grievance platform. AI outputs are recommendations for human review, not official decisions. Do not use the demo for emergencies or submit sensitive personal information.
 
-- Frontend: React, TypeScript, Vite, Lucide icons, responsive custom CSS
-- Backend: Node.js, Express, TypeScript
-- Database: PostgreSQL
-- Auth: bcrypt password hashes + JWT in an HttpOnly cookie
-- AI: optional Google Gemini REST API for structured complaint classification and embeddings
-- Duplicate suggestions: cosine similarity over stored Gemini embeddings when configured; lexical similarity fallback otherwise
-- Uploads: local server storage outside the public web root, with an authenticated photo endpoint
+## Overview
 
-## What works in the MVP
+Citizens can submit local service complaints—such as water-supply problems, potholes, damaged streetlights, drainage, waste, and electrical hazards—and track their progress. Gemini can interpret a complaint, suggest a category and responsible department, estimate urgency, explain its recommendation, and analyze an optional photo. Administrators and department officers manage assignment and resolution through role-based workflows.
 
-- Public citizen registration and email/password login
-- Seeded demo accounts for citizen, administrator, and two department officers
-- Citizen complaint creation with optional JPG/PNG/WEBP photo (max 5 MB)
-- Hindi/English text input; browser-based Hindi speech input where supported
-- Gemini classification when `GEMINI_API_KEY` works; otherwise `DEMO MODE` uses transparent keyword rules
-- Optional Gemini embeddings; if unavailable, duplicate suggestions fall back to lexical similarity
-- Complaint ticket IDs, timeline, assignment, status changes, resolution notes, audit logs, and in-app notifications
-- Configurable SLA windows; overdue complaints are escalated when dashboard/list endpoints run
-- Role checks: citizens see their own reports; officers see reports assigned to their department or user; admins manage all reports
-- Health check at `/api/health`
+The application distinguishes real AI results from rule-based fallback results. When the AI provider is unavailable, the app may use a clearly labeled demo fallback rather than presenting the fallback as an AI response.
 
-## Requirements
+## Features
 
-Install these locally:
+### Citizen experience
 
-1. Node.js 20 or later (Node 22 recommended)
-2. npm
-3. Docker Desktop (recommended for local PostgreSQL) OR an existing PostgreSQL 15+ database
-4. Optional: a Google Gemini API key for real LLM classification and embedding calls
+- Email/password registration and login with an HTTP-only session cookie.
+- Submit complaints with a title, description, category/area details, optional image, and consent-based location sharing.
+- Hindi and English text input; optional browser speech input where supported.
+- Ticket IDs, complaint detail pages, status timeline, and complaint tracking.
+- Profile editing and account settings.
+- In-app notifications for complaint workflow events.
 
-## Run on Windows (PowerShell) with VS Code
+### AI-assisted triage
 
-### 1. Extract the ZIP
+- Gemini-powered structured complaint classification.
+- Suggested category, department, urgency, summary, and explanation.
+- Optional photo analysis for visible issue context.
+- Text embeddings for semantic similarity and duplicate suggestions, with lexical fallback when embeddings are unavailable.
+- AI results remain reviewable by people; duplicate matching suggests related reports and does not automatically merge them.
+- Admin review feedback for comparing predicted categories with human-corrected categories.
 
-Extract `civicconnect-ai.zip`, then open the extracted `civicconnect-ai` folder in VS Code.
+### Administration and resolution
+
+- Role-based views for Citizens, Administrators, and Department Officers.
+- Assign complaints to departments and authorized officers.
+- Update complaint status and add resolution notes.
+- Activity timeline and audit records.
+- Configurable SLA thresholds and escalation checks.
+- Dashboard counts and category summaries.
+- Map view for complaints with coordinates, using OpenStreetMap tiles.
+- CSV export and UI theme settings.
+
+## Technology stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, TypeScript, Vite, responsive CSS |
+| Backend | Node.js, Express.js, TypeScript |
+| Database | PostgreSQL |
+| Authentication | Password hashing, JWT in HTTP-only cookies, role-based authorization |
+| AI | Google Gemini API for classification and image-aware requests |
+| Embeddings | `gemini-embedding-001`; cosine similarity in Node.js, with lexical fallback |
+| Maps | Leaflet/OpenStreetMap tiles |
+| Tooling | npm, Docker Compose, GitHub Actions, Render |
+
+## Architecture
+
+```text
+Citizen / Admin / Department Officer
+                |
+                v
+       React + TypeScript UI
+                |
+        same-origin /api calls
+                |
+                v
+      Node.js + Express API
+        |        |        |
+        |        |        +--> Gemini API
+        |        |              - classification
+        |        |              - photo analysis
+        |        |              - embeddings
+        |        |
+        |        +----------> Authentication / authorization
+        |
+        v
+      PostgreSQL
+       - users and roles
+       - complaints and coordinates
+       - assignment/status history
+       - notifications and audit logs
+       - AI review feedback
+```
+
+## Try the live demo
+
+Open the [live application](https://ai-citizen-grievance-assistant.onrender.com/). For a practical walkthrough:
+
+1. Register or log in as a citizen.
+2. Submit a new complaint with a clear description. Add a photo or share location only if you want to.
+3. Open the complaint details and inspect the AI triage result. Confirm it is an AI result rather than a labeled fallback.
+4. Sign in with an authorized administrator account to assign the complaint.
+5. Sign in with the assigned department officer account to update status and resolution notes.
+6. Return to the citizen view to confirm the new status appears.
+
+The availability of a public demo depends on the hosting and database plans. Do not assume demo accounts or sample data are present on the hosted service.
+
+## Run locally on Windows
+
+### Requirements
+
+- Node.js 20 or later (Node.js 22 LTS is a good choice)
+- npm
+- Docker Desktop with Docker Compose, or an existing PostgreSQL database
+- Optional Gemini API key for live AI classification and embeddings
+
+### 1. Get the code
+
+```powershell
+git clone https://github.com/kundankr93/ai-citizen-grievance-assistant.git
+cd ai-citizen-grievance-assistant
+```
+
+If you already have the project folder, open it directly in VS Code instead.
 
 ### 2. Start PostgreSQL
 
-If Docker Desktop is installed, open a terminal at the project root and run:
+From the project root:
 
 ```powershell
 docker compose up -d postgres
 ```
 
-Wait until PostgreSQL reports healthy. If you already have PostgreSQL, create a database named `civicconnect` and use its credentials in the environment file instead.
-
-### 3. Configure backend environment
-
-Copy the example file:
+### 3. Configure the backend
 
 ```powershell
 Copy-Item server/.env.example server/.env
 ```
 
-Open `server/.env` and set `DATABASE_URL` and a long random `JWT_SECRET`. For a local Docker database the example `DATABASE_URL` works as-is. To enable real Gemini AI, set `GEMINI_API_KEY` to your own key. Keep this file private and never commit it.
+Open `server/.env` locally and set the required database URL and a strong, unique `JWT_SECRET`. To enable live AI, set `GEMINI_API_KEY` to a valid Google Gemini API key. Keep the `.env` file private and never commit it.
 
-Without a Gemini key, the project works in **DEMO MODE** using rule-based classification and lexical duplicate matching. This is clearly indicated in the UI and API response. A key does not guarantee every AI call will succeed; provider errors fall back to demo classification and are logged server-side.
+Typical configuration keys include:
 
-### 4. Install and initialize the backend
+| Variable | Purpose |
+|---|---|
+| `NODE_ENV` | `development` locally, `production` on the host |
+| `PORT` | Express port; defaults to `4000` locally |
+| `CLIENT_ORIGIN` | Allowed frontend origin for local development |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_SSL` | Enable TLS when required by the hosted database |
+| `JWT_SECRET` | Secret used to sign authentication tokens; use a unique secret of at least 32 characters in production |
+| `COOKIE_SECURE` | Must be `true` when serving over HTTPS in production |
+| `GEMINI_API_KEY` | Server-side Gemini API key; leave empty only when using fallback/demo mode |
+| `GEMINI_MODEL` | Classification model; current deployment is configured for `gemini-3.5-flash-lite` |
+| `GEMINI_EMBEDDING_MODEL` | Embedding model; current configuration uses `gemini-embedding-001` |
+| `UPLOAD_DIR` | Private local upload directory for development |
+| `SLA_HIGH_HOURS`, `SLA_MEDIUM_HOURS`, `SLA_LOW_HOURS` | Configurable SLA thresholds |
+
+Never put `GEMINI_API_KEY` in frontend environment variables, browser code, screenshots, or GitHub.
+
+### 4. Install, migrate, and seed the database
+
+Open a terminal for the backend:
 
 ```powershell
 cd server
@@ -74,11 +165,13 @@ npm run db:seed
 npm run dev
 ```
 
-Keep this terminal open. API runs at `http://localhost:4000`.
+Keep this terminal running. The API is normally available at `http://localhost:4000`.
 
-### 5. Start the frontend in a second terminal
+The seed command creates **local-development demo data and accounts**. Do not run the seed command against a production database unless you have reviewed the seed script and intentionally want those records.
 
-From the project root:
+### 5. Start the frontend
+
+Open a second terminal from the project root:
 
 ```powershell
 cd client
@@ -86,106 +179,99 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints, usually `http://localhost:5173`. The Vite proxy sends `/api` requests to the Express server.
+Open the local URL printed by Vite, normally `http://localhost:5173`.
 
-### 6. Build-check both apps
+### 6. Check the API
 
-In the server terminal (or a new server-directory terminal):
+- Local application: `http://localhost:5173`
+- Local health endpoint: `http://localhost:4000/api/health`
+- Live health endpoint: `https://ai-citizen-grievance-assistant.onrender.com/api/health`
+
+The health endpoint reports database status and whether AI configuration is present. `configured: true` means the key is present; it does **not** guarantee every model request will succeed. A live AI request should be tested separately.
+
+## Development and test commands
+
+Run these from the relevant folder.
+
+Backend (`server/`):
 
 ```powershell
 npm run typecheck
 npm test
 npm run build
+npm run ai:check
+npm audit --audit-level=high
 ```
 
-In the client directory:
+Frontend (`client/`):
 
 ```powershell
 npm run build
+npm audit --audit-level=high
 ```
 
-## Demo logins
+`npm run ai:check` makes live provider requests and consumes API quota. Run it manually when needed; it should not be required for every CI build. Unit tests cover selected classification and duplicate-similarity behaviors; they are not a substitute for full end-to-end testing.
 
-All seeded demo accounts use the password `Demo@12345`:
+## Deployment
 
-| Role | Email | Permissions |
-|---|---|---|
-| Citizen | `citizen@civicconnect.demo` | Submit and track only their own complaints |
-| Administrator | `admin@civicconnect.demo` | View all complaints, assign departments/officers, change status |
-| Water officer | `officer.water@civicconnect.demo` | View water-department and directly assigned complaints; update status |
-| Roads officer | `officer.roads@civicconnect.demo` | View roads-department and directly assigned complaints; update status |
+The current public demo is hosted on Render:
 
-**Demo credentials are for local development only. Change or remove them before any internet-facing deployment.** The seed script updates these demo accounts when rerun. New registrations always receive the `citizen` role; public registration cannot create an admin or officer.
+- App: https://ai-citizen-grievance-assistant.onrender.com/
+- Health: https://ai-citizen-grievance-assistant.onrender.com/api/health
 
-## Environment variables
+The repository includes `render.yaml` and deployment notes. Configure `DATABASE_URL`, `GEMINI_API_KEY`, `JWT_SECRET`, and the other production environment variables in Render's dashboard, not in source control. Ensure the web service and PostgreSQL database use a compatible region and TLS configuration.
 
-| Variable | Purpose | Default |
-|---|---|---|
-| `PORT` | Express port | `4000` |
-| `CLIENT_ORIGIN` | Allowed frontend origin | `http://localhost:5173` |
-| `DATABASE_URL` | PostgreSQL connection string | local Docker database |
-| `JWT_SECRET` | Session signing secret | development fallback; override before use |
-| `COOKIE_SECURE` | Secure cookie flag for HTTPS | `false` |
-| `GEMINI_API_KEY` | Server-side Gemini API key | empty / demo mode |
-| `GEMINI_MODEL` | Text classification model | `gemini-3.8-flash` |
-| `GEMINI_EMBEDDING_MODEL` | Embedding model | `gemini-embedding-001` |
-| `UPLOAD_DIR` | Private upload folder | `uploads` relative to server working directory |
-| `SLA_HIGH_HOURS` | High-urgency SLA | `24` |
-| `SLA_MEDIUM_HOURS` | Medium-urgency SLA | `72` |
-| `SLA_LOW_HOURS` | Low-urgency SLA | `120` |
+### Production considerations
 
-For production, set `COOKIE_SECURE=true`, serve over HTTPS, use a strong unique `JWT_SECRET`, configure suitable CORS and database network rules, add persistent private object storage, and review the application security posture. Do not expose the local upload folder as a static public directory.
+- Local uploaded photos are not durable on an ephemeral filesystem. Use private persistent object storage before relying on uploaded photos in long-term production.
+- Email delivery requires an email provider; in-app notifications are separate from email.
+- Configure database backups and retention appropriate for your hosting plan. Check the database provider's expiration and persistence terms, especially on free tiers.
+- Keep the Gemini API key rotated if it has ever appeared in a screenshot or public output.
+- Keep OpenStreetMap attribution visible and follow the tile provider's usage policy. For sustained production traffic, consider a hosted tile service with an appropriate usage plan.
+- This project is a prototype and has not been independently security-audited or evaluated for use by public authorities.
 
-## API routes
+## API overview
 
-- `GET /api/health` — liveness and AI configuration status
-- `POST /api/auth/register` — create a citizen account
-- `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
-- `GET /api/dashboard/summary` — counts and category distribution for the signed-in role
-- `GET /api/complaints` — role-scoped complaint list; accepts optional `status`, `category`, and `search` filters
-- `POST /api/complaints` — create complaint (multipart form, optional `photo` field)
-- `GET /api/complaints/:id` — complaint details and timeline, with authorization
-- `GET /api/complaints/:id/photo` — authenticated photo retrieval
-- `PATCH /api/complaints/:id/assign` — administrator assignment
-- `PATCH /api/complaints/:id/status` — administrator/officer status update; resolution note required for `RESOLVED`
-- `POST /api/complaints/:id/comments` — append a timeline note
-- `GET /api/notifications`, `PATCH /api/notifications/:id/read`
-- `GET /api/users/officers` — administrator-only officer list
+Representative routes include:
 
-## Design notes and limitations
+- `GET /api/health` — API/database health and AI configuration status.
+- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` — authentication.
+- `GET /api/dashboard/summary` — role-scoped dashboard summary.
+- `GET /api/complaints`, `POST /api/complaints`, `GET /api/complaints/:id` — complaint list, creation, and details.
+- `PATCH /api/complaints/:id/assign` — admin assignment.
+- `PATCH /api/complaints/:id/status` — status update and resolution note.
+- `GET /api/complaints/:id/photo` — authorized photo retrieval.
+- `/api/notifications` — in-app notifications and read state.
+- `/api/users` — user/profile-related operations.
+- `/api/ai` — AI review/quality-related operations.
 
-- This app does not create official municipal tickets or contact municipal systems.
-- The rule-based fallback is not an AI model. It is explicitly labelled `DEMO MODE`.
-- Duplicate detection only suggests related open reports; it does not automatically merge or reject them.
-- Embeddings are stored as JSONB and cosine similarity is calculated in Node. pgvector is not required for this starter. You may add pgvector later if your hosting provider supports the extension.
-- SLA escalation runs when the dashboard or complaint-list endpoints are requested; for production use, move it into a scheduled worker/queue.
-- Browser speech recognition varies across browsers and may require HTTPS. Text input always remains available.
-- Local file uploads are suitable only for development/demo. Use private persistent storage for production.
-- AI model availability, API quota, and cost depend on the provider account. The app should not be described as running real AI if the health endpoint says demo mode or if a request fell back to rules.
+Check the route files in `server/src/routes/` for the current request schemas and response shapes.
 
-## Testing
+## Security and privacy
 
-Backend unit test:
+- The backend validates requests and enforces role-based access.
+- Passwords are stored as hashes; authentication uses HTTP-only cookies.
+- Uploaded complaint photos are private and should be retrieved through the authorized endpoint.
+- Sharing GPS coordinates requires explicit user action and browser permission.
+- Do not put real secrets, personal citizen data, private uploads, `.env` files, or local backups in Git.
+- AI classification and urgency are suggestions. Human staff retain responsibility for assignments and resolution decisions.
 
-```powershell
-cd server
-npm test
-```
+See [`SECURITY.md`](SECURITY.md), [`docs/DEPLOYMENT_RENDER.md`](docs/DEPLOYMENT_RENDER.md), and [`docs/RELEASE_TEST_PLAN.md`](docs/RELEASE_TEST_PLAN.md) for more detail.
 
-The included tests cover lexical similarity, cosine similarity, and possible-duplicate suggestions. Run the full build checks shown above and test the workflow manually with each demo role before using the project in a portfolio.
+## Roadmap
 
-## Suggested portfolio description
+- Move uploads to durable private object storage.
+- Add an email provider for verification, password reset, and optional email alerts.
+- Add a scheduled worker/queue for SLA escalation rather than relying on user traffic.
+- Expand the labelled Hindi/English evaluation dataset and measure precision, recall, and failure cases.
+- Add integration/end-to-end tests for user roles, map/location permissions, uploads, and AI provider failures.
 
-**CivicConnect AI — AI-Assisted Citizen Grievance Management System**
-Built a role-based civic reporting MVP using React, TypeScript, Node.js, Express, and PostgreSQL. Added optional Gemini-based multilingual complaint triage, embedding-assisted duplicate suggestions with a lexical fallback, ticket tracking, department assignment, audit history, notifications, and configurable SLA escalation. Evaluated and labelled demo-mode behavior separately from real AI API responses.
+## Portfolio summary
 
-## Build verification note
+**CivicConnect AI — AI-Assisted Citizen Grievance Management System.** Built a full-stack civic-tech application using React, TypeScript, Node.js, Express, and PostgreSQL, with Gemini-based complaint triage, optional image analysis, embedding-assisted duplicate suggestions, consent-based location reporting, role-based complaint assignment, resolution tracking, audit history, and notifications. Added automated type checks, unit tests, a production frontend build, and deployment configuration.
 
-This source package was reviewed for file/configuration consistency and its JSON configuration files were parsed. In the generation environment, npm dependency installation timed out, so a full dependency-backed TypeScript/Vite build could not be completed here. On your machine, use the commands above; if a compiler or runtime error appears, share the complete terminal output so the specific issue can be fixed. Do not treat an unrun build as a passing test.
+---
 
-
-## Gemini API diagnostics
-
-From the `server` folder, run `npm run ai:check` to make a real classification request and a real embedding request. The script prints the provider's HTTP status and error message if a request fails. It can consume API quota. A configured key only means the environment variable is present; it does not prove the provider call works.
-
-The application uses `gemini-3.8-flash` by default and does not override temperature for Gemini 3.8. Provider API keys are sent in the `x-goog-api-key` header, never as a query-string parameter. Rotate any key that has been exposed in a screenshot or public artifact.
+**Maintainer:** [kundankr93](https://github.com/kundankr93)  
+**Repository:** https://github.com/kundankr93/ai-citizen-grievance-assistant  
+**Live demo:** https://ai-citizen-grievance-assistant.onrender.com/
